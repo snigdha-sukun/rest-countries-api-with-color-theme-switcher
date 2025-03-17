@@ -3,16 +3,10 @@ import "styled-components";
 declare module "styled-components" {
 	export interface DefaultTheme {
 		colors: {
-			white: string;
-			lightMode: {
-				background: string;
-				input: string;
-				text: string;
-			};
-			darkMode: {
-				background: string;
-				elements: string;
-			};
+			element: string;
+			background: string;
+			input: string;
+			text: string;
 		};
 		fontSizes: {
 			home: string;

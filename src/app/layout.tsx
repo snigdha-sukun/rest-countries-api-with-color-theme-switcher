@@ -1,32 +1,38 @@
 import type { Metadata } from "next";
 import { Nunito_Sans } from "next/font/google";
 import "./globals.css";
+import ThemeWrapper from "@/lib/ThemeWrapper";
+import Header from "@/components/Header/Header";
+import { CustomThemeProvider } from "@/context/ThemeContext";
 import StyledComponentsRegistry from "@/lib/StyledComponentsRegistry";
-import GlobalStyle from "./global-styles";
+import { CountriesProvider } from "@/context/CountriesContext";
 
-const nunitoSans = Nunito_Sans({
-  variable: "--font-nunito-sans",
-  subsets: ["latin"],
-});
+const nunitoSans = Nunito_Sans();
 
 export const metadata: Metadata = {
-  title: "Countries Flags",
-  description: "REST Countries API with color theme switcher",
+	title: "Countries Flags",
+	description: "REST Countries API with color theme switcher",
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={`${nunitoSans.variable}`}>
-        <StyledComponentsRegistry>
-          <GlobalStyle />
-        {children}
-        </StyledComponentsRegistry>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<body className={`${nunitoSans.className}`}>
+				<StyledComponentsRegistry>
+					<CustomThemeProvider>
+						<ThemeWrapper>
+							<CountriesProvider>
+								<Header />
+								{children}
+							</CountriesProvider>
+						</ThemeWrapper>
+					</CustomThemeProvider>
+				</StyledComponentsRegistry>
+			</body>
+		</html>
+	);
 }

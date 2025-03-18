@@ -1,6 +1,6 @@
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { StyledButton } from "./Button.styled";
+import { ButtonText, StyledButton } from "./Button.styled";
 
 const Button = ({
 	text,
@@ -28,7 +28,7 @@ const Button = ({
 			onClick={handleClick}
 		>
 			{icon && <FontAwesomeIcon icon={icon} />}
-			{text}
+			<ButtonText>{text}</ButtonText>
 		</StyledButton>
 	);
 };

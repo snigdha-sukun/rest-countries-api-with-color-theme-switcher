@@ -1,4 +1,5 @@
 "use client";
+import { mobile } from "@/utils/mixins";
 import styled from "styled-components";
 
 export const SearchCountryContainer = styled.div`
@@ -12,6 +13,10 @@ export const SearchCountryContainer = styled.div`
     border-radius: 0.25rem;
     cursor: pointer;
     width: 30rem;
+
+    ${mobile`
+        width: 100%;
+    `}
 `;
 
 export const SearchInput = styled.input`

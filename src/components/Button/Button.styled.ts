@@ -34,3 +34,10 @@ export const StyledButton = styled.button<{
         cursor: not-allowed;
     }
 `;
+
+export const ButtonText = styled.span`
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`;

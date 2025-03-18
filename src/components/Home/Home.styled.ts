@@ -1,4 +1,5 @@
 "use client";
+import { tablet } from "@/utils/mixins";
 import styled from "styled-components";
 
 export const StyledHomeContainer = styled.div`
@@ -18,4 +19,10 @@ export const StyledHomeHeader = styled.div`
     justify-content: space-between;
     align-items: center;
     margin: 2rem 0;
-    `;
+
+    ${tablet`
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    `}
+`;

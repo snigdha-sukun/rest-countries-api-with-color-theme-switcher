@@ -14,9 +14,6 @@ This is a solution to the [REST Countries API with color theme switcher challeng
   - [Continued development](#continued-development)
   - [Useful resources](#useful-resources)
 - [Author](#author)
-- [Acknowledgments](#acknowledgments)
-
-**Note: Delete this note and update the table of contents based on what sections you keep.**
 
 ## Overview
 
@@ -33,83 +30,439 @@ Users should be able to:
 
 ### Screenshot
 
-![Screenshot of the project](./screenshot.jpg)
-
-Add a screenshot of your solution. The easiest way to do this is to use Firefox to view your project, right-click the page and select "Take a Screenshot". You can choose either a full-height screenshot or a cropped one based on how long the page is. If it's very long, it might be best to crop it.
-
-Alternatively, you can use a tool like [FireShot](https://getfireshot.com/) to take the screenshot. FireShot has a free option, so you don't need to purchase it.
-
-Then crop/optimize/edit your image however you like, add it to your project, and update the file path in the image above.
-
-**Note: Delete this note and the paragraphs above when you add your screenshot. If you prefer not to add a screenshot, feel free to remove this entire section.**
+![Screenshot of the project](./screenshot.gif)
 
 ### Links
 
-- Solution URL: [Add solution URL here](https://your-solution-url.com)
-- Live Site URL: [Add live site URL here](https://your-live-site-url.com)
+- Solution URL: [Github](https://github.com/snigdha-sukun/rest-countries-api-with-color-theme-switcher)
+- Live Site URL: [Vercel](https://rest-countries-api-with-color-theme-switcher-rosy-nine.vercel.app/)
 
 ## My process
 
 ### Built with
 
-- Semantic HTML5 markup
-- CSS custom properties
-- Flexbox
-- CSS Grid
-- Mobile-first workflow
-- [React](https://reactjs.org/) - JS library
 - [Next.js](https://nextjs.org/) - React framework
 - [Styled Components](https://styled-components.com/) - For styles
 
 ### What I learned
 
-Use this section to recap over some of your major learnings while working through this project. Writing these out and providing code samples of areas you want to highlight is a great way to reinforce your own knowledge.
+I learned about the `use client` directive in Next.js and is used to mark a component as a Client Component.
 
-To see how you can add code snippets, see below:
+*Client Components:*
 
-```html
-<h1>Some HTML code I'm proud of</h1>
-```
+- These are components that run on the client side (in the browser).
+- They can use browser-specific APIs, React hooks, and interactivity (e.g., `useState`, `useEffect`, event listeners, `styled-components`).
+- They are hydrated on the client side, meaning they are sent to the browser as JavaScript and executed there.
 
-```css
-.proud-of-this-css {
-  color: papayawhip;
+*Server Components:*
+
+- These are components that run on the server side.
+- They cannot use browser-specific APIs or React hooks.
+- They are rendered on the server and sent to the client as HTML, reducing the amount of JavaScript sent to the browser.
+
+Default to Server Components for better performance and use Client Components sparingly.
+
+I learned how to use Google fonts in Next.js
+
+```tsx
+import { Nunito_Sans } from "next/font/google";
+const nunitoSans = Nunito_Sans({
+  subsets: ["latin"],
+  weight: ["300", "600", "800"],
+});
+
+export default function RootLayout({
+ children,
+}: Readonly<{
+ children: React.ReactNode;
+}>) {
+ return (
+  <html lang="en">
+   <body className={`${nunitoSans.className}`}>
+    <StyledComponentsRegistry>
+     <CustomThemeProvider>
+      <ThemeWrapper>
+       <CountriesProvider>
+        <Header />
+        {children}
+       </CountriesProvider>
+      </ThemeWrapper>
+     </CustomThemeProvider>
+    </StyledComponentsRegistry>
+   </body>
+  </html>
+ );
 }
 ```
 
-```js
-const proudOfThisFunc = () => {
-  console.log('🎉')
+I learned how to setup `styled-components` in Next.js:
+
+```tsx
+'use client';
+
+import type React from 'react';
+import { useState } from 'react';
+import { useServerInsertedHTML } from 'next/navigation';
+import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
+
+export default function StyledComponentsRegistry({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const [styledComponentsStyleSheet] = useState(() => new ServerStyleSheet());
+
+  useServerInsertedHTML(() => {
+    const styles = styledComponentsStyleSheet.getStyleElement();
+    styledComponentsStyleSheet.instance.clearTag();
+    return <>{styles}</>;
+  });
+
+  if (typeof window !== 'undefined') return <>{children}</>;
+
+  return (
+    <StyleSheetManager sheet={styledComponentsStyleSheet.instance}>
+      {children}
+    </StyleSheetManager>
+  );
 }
 ```
 
-If you want more help with writing markdown, we'd recommend checking out [The Markdown Guide](https://www.markdownguide.org/) to learn more.
+```ts
+import type { NextConfig } from "next";
 
-**Note: Delete this note and the content within this section and replace with your own learnings.**
+const nextConfig: NextConfig = {
+ compiler: {
+  styledComponents: true,
+ },
+};
+
+export default nextConfig;
+```
+
+I learned how to setup light & dark theme using `styled-components`:
+
+```ts
+export const lightTheme = {
+ colors: {
+  element: "hsl(0, 0%, 100%)",
+  background: "hsl(0, 0%, 98%)",
+  input: "hsl(0, 0%, 52%)",
+  text: "hsl(200, 15%, 8%)",
+ },
+ fontSizes: {
+  home: "14px",
+  details: "16px",
+ },
+ fontWeights: {
+  base: 300,
+  bold: 600,
+  bolder: 800
+ },
+};
+
+export const darkTheme = {
+ colors: {
+  text: "hsl(0, 0%, 100%)",
+  background: "hsl(207, 26%, 17%)",
+  element: "hsl(209, 23%, 22%)",
+  input: "hsl(209, 23%, 22%)",
+ },
+ fontSizes: {
+  home: "14px",
+  details: "16px",
+ },
+ fontWeights: {
+  base: 300,
+  bold: 600,
+  bolder: 800,
+ },
+};
+```
+
+```tsx
+"use client";
+
+import { darkTheme, lightTheme } from "@/utils/theme";
+import type { ReactNode } from "react";
+import {
+ createContext,
+ useContext,
+ useMemo,
+ useState,
+ useCallback,
+} from "react";
+
+type ThemeContextType = {
+ isDarkMode: boolean;
+ theme: typeof lightTheme;
+ toggleTheme: () => void;
+};
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export function CustomThemeProvider({
+ children,
+}: { readonly children: ReactNode }) {
+ const [isDarkMode, setIsDarkMode] = useState(false);
+
+ const toggleTheme = useCallback(() => {
+  setIsDarkMode((prev) => !prev);
+ }, []);
+
+ const theme = isDarkMode ? darkTheme : lightTheme;
+
+ const value = useMemo(
+  () => ({ isDarkMode, toggleTheme, theme }),
+  [isDarkMode, toggleTheme, theme],
+ );
+
+ return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+ );
+}
+
+export function useTheme() {
+ const context = useContext(ThemeContext);
+ if (!context) {
+  throw new Error("useTheme must be used within a CustomThemeProvider");
+ }
+ return context;
+}
+```
+
+```tsx
+"use client";
+
+import GlobalStyle from "@/app/global-styles";
+import { useTheme } from "@/context/ThemeContext";
+import type React from "react";
+import { ThemeProvider } from "styled-components";
+
+export default function ThemeWrapper({
+ children,
+}: {
+ readonly children: React.ReactNode;
+}) {
+ const { theme } = useTheme();
+ return (
+  <ThemeProvider theme={theme}>
+   <GlobalStyle />
+   {children}
+  </ThemeProvider>
+ );
+}
+```
+
+```tsx
+const { isDarkMode, toggleTheme } = useTheme();
+
+<Button
+    icon={isDarkMode ? faMoonSolid : faMoon}
+    text="Dark Mode"
+    handleClick={toggleTheme}
+    hasShadow={false}
+   />
+```
+
+I learned how to import JSON data from public folder in Next.js:
+
+```tsx
+import countries from "@/public/data.json";
+```
+
+I learned different ways to navigate in Next.js:
+
+```tsx
+import { redirect, useRouter } from "next/navigation";
+
+redirect(`/countries/${searchResult.alpha3Code}`)
+
+const router = useRouter();
+router.push("/")
+```
+
+I learned how to setup pagination:
+
+```tsx
+const [filteredCountries, setFilteredCountries] =
+  useState<CountryType[]>(countries);
+ const [currentPage, setCurrentPage] = useState(1);
+ const [itemsPerPage] = useState(8);
+
+ const filterCountryByRegion = useCallback(
+  (region: string) => {
+   const filtered = region
+    ? countries.filter((country) => country.region === region)
+    : countries; // If no region is selected, show all countries
+   setFilteredCountries(filtered);
+   setCurrentPage(1); // Reset to the first page after filtering
+  },
+  [],
+ );
+
+ const totalPages = useMemo(() => {
+  return Math.ceil(filteredCountries.length / itemsPerPage);
+ }, [filteredCountries, itemsPerPage]);
+
+ const currentItems = useMemo(() => {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return filteredCountries.slice(startIndex, endIndex);
+ }, [filteredCountries, currentPage, itemsPerPage]);
+
+ const goToPage = useCallback((page: number) => {
+  setCurrentPage(page);
+ }, []);
+
+ const nextPage = useCallback(() => {
+  setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+ }, [totalPages]);
+
+ const prevPage = useCallback(() => {
+  setCurrentPage((prev) => Math.max(prev - 1, 1));
+ }, []);
+ ```
+
+```tsx
+export const getPageRange = (currentPage: number, totalPages: number) => {
+ let start = Math.max(1, currentPage - 2);
+ let end = Math.min(totalPages, currentPage + 2);
+
+ if (currentPage <= 3) {
+  end = Math.min(5, totalPages);
+ } else if (currentPage >= totalPages - 2) {
+  start = Math.max(totalPages - 4, 1);
+ }
+
+ return { start, end };
+};
+
+const { start, end } = getPageRange(currentPage, totalPages);
+ return (
+  <StyledPaginationContainer>
+   <Button
+    icon={faCaretLeft}
+    handleClick={prevPage}
+    isDisabled={currentPage === 1}
+    iconMargin={false}
+   />
+
+   {Array.from({ length: end - start + 1 }, (_, i) => start + i).map(
+    (page) => (
+     <Button
+      key={page}
+      text={page.toString()}
+      handleClick={() => goToPage(page)}
+      isActive={page === currentPage}
+     />
+    ),
+   )}
+   <Button
+    icon={faCaretRight}
+    handleClick={nextPage}
+    isDisabled={currentPage === totalPages}
+    iconMargin={false}
+   />
+  </StyledPaginationContainer>
+ );
+```
+
+I learned how to create custom dropdown:
+
+```tsx
+"use client";
+import { useEffect, useRef, useState } from "react";
+import {
+ StyledArrowIcon,
+ StyledCustomSelect,
+ StyledDropdownItem,
+ StyledDropdownList,
+ StyledSelectHeader,
+} from "./FilterCountry.styled";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+
+const FilterCountry = ({
+ filterCountryByRegion,
+}: { filterCountryByRegion: (region: string) => void }) => {
+ const [selectedValue, setSelectedValue] = useState("");
+ const [isOpen, setIsOpen] = useState(false);
+ const dropdownRef = useRef<HTMLDivElement>(null);
+ const options = [
+  { value: "", label: "All Regions" },
+  { value: "Africa", label: "Africa" },
+  { value: "Americas", label: "America" },
+  { value: "Asia", label: "Asia" },
+  { value: "Europe", label: "Europe" },
+  { value: "Oceania", label: "Oceania" },
+ ];
+ const selectedOption =
+  options.find((option) => option.value === selectedValue) || options[0];
+
+ const onChange = (value: string) => {
+  setSelectedValue(value);
+  filterCountryByRegion(value)
+ };
+
+ useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+   if (
+    dropdownRef.current &&
+    !dropdownRef.current.contains(event.target as Node)
+   ) {
+    setIsOpen(false);
+   }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+ }, []);
+
+ const handleOptionClick = (value: string) => {
+  onChange(value);
+  setIsOpen(false);
+ };
+
+ return (
+  <StyledCustomSelect ref={dropdownRef}>
+   <StyledSelectHeader onClick={() => setIsOpen(!isOpen)}>
+    {selectedOption.value === "" ? "Filter by Region" : selectedOption.label}
+    <StyledArrowIcon isOpen={isOpen}>
+     <FontAwesomeIcon icon={faChevronDown} />
+    </StyledArrowIcon>
+   </StyledSelectHeader>
+   {isOpen && (
+    <StyledDropdownList>
+     {options.map((option) => {
+      if (option.value === "" && option.value === selectedValue) return null;
+      return (
+       <StyledDropdownItem
+        key={option.value}
+        onClick={() => handleOptionClick(option.value)}
+        $isSelected={option.value === selectedValue}
+       >
+        {option.label}
+       </StyledDropdownItem>
+      );
+     })}
+    </StyledDropdownList>
+   )}
+  </StyledCustomSelect>
+ );
+};
+export default FilterCountry;
+```
 
 ### Continued development
 
-Use this section to outline areas that you want to continue focusing on in future projects. These could be concepts you're still not completely comfortable with or techniques you found useful that you want to refine and perfect.
-
-**Note: Delete this note and the content within this section and replace with your own plans for continued development.**
+I would like to continue practicing making websites using Next.js
 
 ### Useful resources
 
-- [Example resource 1](https://www.example.com) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
-- [Example resource 2](https://www.example.com) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
-
-**Note: Delete this note and replace the list above with resources that helped you during the challenge. These could come in handy for anyone viewing your solution or for yourself when you look back on this project in the future.**
+- [Importing JSON data from public folder with NextJS](https://stackoverflow.com/q/75746676) - This helped me in fetching the JSON data into my application.
+- [NextJS docs](https://nextjs.org/docs) - This was a good starting point to learn NextJS
 
 ## Author
 
-- Website - [Add your name here](https://www.your-site.com)
-- Frontend Mentor - [@yourusername](https://www.frontendmentor.io/profile/yourusername)
-- Twitter - [@yourusername](https://www.twitter.com/yourusername)
-
-**Note: Delete this note and add/remove/edit lines above based on what links you'd like to share.**
-
-## Acknowledgments
-
-This is where you can give a hat tip to anyone who helped you out on this project. Perhaps you worked in a team or got some inspiration from someone else's solution. This is the perfect place to give them some credit.
-
-**Note: Delete this note and edit this section's content as necessary. If you completed this challenge by yourself, feel free to delete this section entirely.**
+- Frontend Mentor - [@snigdha-sukun](https://www.frontendmentor.io/profile/snigdha-sukun)

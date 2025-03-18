@@ -2,16 +2,25 @@
 
 import { darkTheme, lightTheme } from "@/utils/theme";
 import type { ReactNode } from "react";
-import { createContext, useContext, useMemo, useState, useCallback } from "react";
+import {
+	createContext,
+	useContext,
+	useMemo,
+	useState,
+	useCallback,
+} from "react";
 
 type ThemeContextType = {
 	isDarkMode: boolean;
-	toggleTheme: () => void;
 	theme: typeof lightTheme;
+	toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-export function CustomThemeProvider({ children }: { readonly children: ReactNode }) {
+
+export function CustomThemeProvider({
+	children,
+}: { readonly children: ReactNode }) {
 	const [isDarkMode, setIsDarkMode] = useState(false);
 
 	const toggleTheme = useCallback(() => {
@@ -20,12 +29,13 @@ export function CustomThemeProvider({ children }: { readonly children: ReactNode
 
 	const theme = isDarkMode ? darkTheme : lightTheme;
 
-	const value = useMemo(() => ({ isDarkMode, toggleTheme, theme }), [isDarkMode, toggleTheme, theme]);
+	const value = useMemo(
+		() => ({ isDarkMode, toggleTheme, theme }),
+		[isDarkMode, toggleTheme, theme],
+	);
 
 	return (
-		<ThemeContext.Provider value={value}>
-			{children}
-		</ThemeContext.Provider>
+		<ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 	);
 }
 

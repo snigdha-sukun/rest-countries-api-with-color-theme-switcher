@@ -7,7 +7,10 @@ import { CustomThemeProvider } from "@/context/ThemeContext";
 import StyledComponentsRegistry from "@/lib/StyledComponentsRegistry";
 import { CountriesProvider } from "@/context/CountriesContext";
 
-const nunitoSans = Nunito_Sans();
+const nunitoSans = Nunito_Sans({
+	subsets: ["latin"],
+	weight: ["300", "600", "800"],
+});
 
 export const metadata: Metadata = {
 	title: "Countries Flags",
